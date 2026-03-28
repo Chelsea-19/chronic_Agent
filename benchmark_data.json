@@ -1,0 +1,775 @@
+{
+  "digest_samples": [
+    {
+      "id": "digest_synth_0",
+      "patient_context": {
+        "name": "王五_0",
+        "gender": "女",
+        "age": 62,
+        "diagnosis_summary": "2型糖尿病，高血压三级"
+      },
+      "input_text": null,
+      "input_events": [
+        {
+          "type": "blood_pressure",
+          "num1": 139,
+          "num2": 84,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 9.2,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 158,
+          "num2": 85,
+          "occurred_at": "2026-03-26T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.2,
+          "occurred_at": "2026-03-26T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 145,
+          "num2": 96,
+          "occurred_at": "2026-03-25T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 137,
+          "num2": 83,
+          "occurred_at": "2026-03-24T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 7.2,
+          "occurred_at": "2026-03-24T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 158,
+          "num2": 95,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 140,
+          "num2": 98,
+          "occurred_at": "2026-03-22T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 150,
+          "num2": 98,
+          "occurred_at": "2026-03-21T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 131,
+          "num2": 95,
+          "occurred_at": "2026-03-20T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 134,
+          "num2": 83,
+          "occurred_at": "2026-03-19T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.8,
+          "occurred_at": "2026-03-19T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 136,
+          "num2": 95,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 141,
+          "num2": 87,
+          "occurred_at": "2026-03-17T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.4,
+          "occurred_at": "2026-03-17T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 137,
+          "num2": 91,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.9,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 130,
+          "num2": 87,
+          "occurred_at": "2026-03-15T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.8,
+          "occurred_at": "2026-03-15T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 142,
+          "num2": 84,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        }
+      ],
+      "expected_flags": [
+        "高血压"
+      ],
+      "expected_action_items": [],
+      "expected_trend_sys_bp_min": 136.28571428571428,
+      "expected_trend_sys_bp_max": 146.28571428571428,
+      "must_include_evidence": [
+        "bp_trend"
+      ]
+    },
+    {
+      "id": "digest_synth_1",
+      "patient_context": {
+        "name": "赵六_1",
+        "gender": "男",
+        "age": 61,
+        "diagnosis_summary": "2型糖尿病，高血压三级"
+      },
+      "input_text": null,
+      "input_events": [
+        {
+          "type": "blood_pressure",
+          "num1": 143,
+          "num2": 90,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.9,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 140,
+          "num2": 93,
+          "occurred_at": "2026-03-26T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 148,
+          "num2": 80,
+          "occurred_at": "2026-03-25T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 132,
+          "num2": 94,
+          "occurred_at": "2026-03-24T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.4,
+          "occurred_at": "2026-03-24T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 133,
+          "num2": 85,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.2,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 140,
+          "num2": 89,
+          "occurred_at": "2026-03-22T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 144,
+          "num2": 83,
+          "occurred_at": "2026-03-21T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 142,
+          "num2": 97,
+          "occurred_at": "2026-03-20T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 142,
+          "num2": 83,
+          "occurred_at": "2026-03-19T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 143,
+          "num2": 92,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.3,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 152,
+          "num2": 89,
+          "occurred_at": "2026-03-17T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.8,
+          "occurred_at": "2026-03-17T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 156,
+          "num2": 81,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 130,
+          "num2": 82,
+          "occurred_at": "2026-03-15T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 159,
+          "num2": 84,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.0,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        }
+      ],
+      "expected_flags": [
+        "高血压"
+      ],
+      "expected_action_items": [],
+      "expected_trend_sys_bp_min": 138.14285714285714,
+      "expected_trend_sys_bp_max": 148.14285714285714,
+      "must_include_evidence": [
+        "bp_trend"
+      ]
+    },
+    {
+      "id": "digest_synth_2",
+      "patient_context": {
+        "name": "陈七_2",
+        "gender": "男",
+        "age": 60,
+        "diagnosis_summary": "2型糖尿病，高血压三级"
+      },
+      "input_text": null,
+      "input_events": [
+        {
+          "type": "blood_pressure",
+          "num1": 154,
+          "num2": 91,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.2,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 147,
+          "num2": 91,
+          "occurred_at": "2026-03-26T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.5,
+          "occurred_at": "2026-03-26T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 155,
+          "num2": 88,
+          "occurred_at": "2026-03-25T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.3,
+          "occurred_at": "2026-03-25T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 143,
+          "num2": 94,
+          "occurred_at": "2026-03-24T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 152,
+          "num2": 96,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 140,
+          "num2": 99,
+          "occurred_at": "2026-03-22T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.8,
+          "occurred_at": "2026-03-22T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 157,
+          "num2": 80,
+          "occurred_at": "2026-03-21T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 133,
+          "num2": 91,
+          "occurred_at": "2026-03-20T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 157,
+          "num2": 81,
+          "occurred_at": "2026-03-19T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 156,
+          "num2": 85,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 143,
+          "num2": 87,
+          "occurred_at": "2026-03-17T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 148,
+          "num2": 84,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 135,
+          "num2": 80,
+          "occurred_at": "2026-03-15T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 134,
+          "num2": 95,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 9.4,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        }
+      ],
+      "expected_flags": [
+        "高血压"
+      ],
+      "expected_action_items": [],
+      "expected_trend_sys_bp_min": 141.71428571428572,
+      "expected_trend_sys_bp_max": 151.71428571428572,
+      "must_include_evidence": [
+        "bp_trend"
+      ]
+    },
+    {
+      "id": "digest_synth_3",
+      "patient_context": {
+        "name": "张三_3",
+        "gender": "男",
+        "age": 45,
+        "diagnosis_summary": "2型糖尿病，高血压三级"
+      },
+      "input_text": null,
+      "input_events": [
+        {
+          "type": "blood_pressure",
+          "num1": 137,
+          "num2": 80,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 141,
+          "num2": 90,
+          "occurred_at": "2026-03-26T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 156,
+          "num2": 83,
+          "occurred_at": "2026-03-25T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 133,
+          "num2": 90,
+          "occurred_at": "2026-03-24T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 142,
+          "num2": 93,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 9.2,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 142,
+          "num2": 92,
+          "occurred_at": "2026-03-22T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.0,
+          "occurred_at": "2026-03-22T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 154,
+          "num2": 89,
+          "occurred_at": "2026-03-21T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.6,
+          "occurred_at": "2026-03-21T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 131,
+          "num2": 81,
+          "occurred_at": "2026-03-20T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 7.0,
+          "occurred_at": "2026-03-20T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 143,
+          "num2": 100,
+          "occurred_at": "2026-03-19T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 145,
+          "num2": 93,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.2,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 132,
+          "num2": 99,
+          "occurred_at": "2026-03-17T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 143,
+          "num2": 97,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.8,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 158,
+          "num2": 83,
+          "occurred_at": "2026-03-15T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 158,
+          "num2": 82,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 7.7,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        }
+      ],
+      "expected_flags": [
+        "高血压"
+      ],
+      "expected_action_items": [],
+      "expected_trend_sys_bp_min": 138.92857142857142,
+      "expected_trend_sys_bp_max": 148.92857142857142,
+      "must_include_evidence": [
+        "bp_trend"
+      ]
+    },
+    {
+      "id": "digest_synth_4",
+      "patient_context": {
+        "name": "王五_4",
+        "gender": "女",
+        "age": 53,
+        "diagnosis_summary": "2型糖尿病，高血压三级"
+      },
+      "input_text": null,
+      "input_events": [
+        {
+          "type": "blood_pressure",
+          "num1": 140,
+          "num2": 93,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.4,
+          "occurred_at": "2026-03-27T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 147,
+          "num2": 94,
+          "occurred_at": "2026-03-26T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 131,
+          "num2": 88,
+          "occurred_at": "2026-03-25T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.6,
+          "occurred_at": "2026-03-25T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 144,
+          "num2": 88,
+          "occurred_at": "2026-03-24T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 131,
+          "num2": 94,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.6,
+          "occurred_at": "2026-03-23T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 153,
+          "num2": 83,
+          "occurred_at": "2026-03-22T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 146,
+          "num2": 97,
+          "occurred_at": "2026-03-21T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 9.5,
+          "occurred_at": "2026-03-21T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 160,
+          "num2": 93,
+          "occurred_at": "2026-03-20T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.3,
+          "occurred_at": "2026-03-20T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 158,
+          "num2": 87,
+          "occurred_at": "2026-03-19T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 7.9,
+          "occurred_at": "2026-03-19T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 151,
+          "num2": 91,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.9,
+          "occurred_at": "2026-03-18T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 135,
+          "num2": 81,
+          "occurred_at": "2026-03-17T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 156,
+          "num2": 97,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 6.5,
+          "occurred_at": "2026-03-16T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 137,
+          "num2": 99,
+          "occurred_at": "2026-03-15T07:50:04.804443"
+        },
+        {
+          "type": "fasting_glucose",
+          "num1": 8.8,
+          "occurred_at": "2026-03-15T07:50:04.804443"
+        },
+        {
+          "type": "blood_pressure",
+          "num1": 140,
+          "num2": 88,
+          "occurred_at": "2026-03-14T07:50:04.804443"
+        }
+      ],
+      "expected_flags": [
+        "高血压"
+      ],
+      "expected_action_items": [],
+      "expected_trend_sys_bp_min": 139.92857142857142,
+      "expected_trend_sys_bp_max": 149.92857142857142,
+      "must_include_evidence": [
+        "bp_trend"
+      ]
+    }
+  ],
+  "meal_samples": [
+    {
+      "id": "meal_1",
+      "patient_context": {
+        "diagnosis_summary": "2型糖尿病"
+      },
+      "input_text": "晚饭喝了全糖奶茶，还吃了两碗米饭",
+      "input_events": [],
+      "expected_tags": [
+        "高糖",
+        "高碳水"
+      ],
+      "forbidden_tags": [],
+      "expected_carbs_category": "high"
+    },
+    {
+      "id": "meal_2",
+      "patient_context": {
+        "diagnosis_summary": "高血压"
+      },
+      "input_text": "中午吃了一份很咸的腊肉炒饭，加了腐乳",
+      "input_events": [],
+      "expected_tags": [
+        "高钠",
+        "高碳水"
+      ],
+      "forbidden_tags": [
+        "健康饮食"
+      ],
+      "expected_carbs_category": null
+    },
+    {
+      "id": "meal_3",
+      "patient_context": {},
+      "input_text": "早上吃了水煮蛋，一杯无糖豆浆，半截玉米",
+      "input_events": [],
+      "expected_tags": [
+        "低脂",
+        "健康比例"
+      ],
+      "forbidden_tags": [
+        "高糖",
+        "高碳水"
+      ],
+      "expected_carbs_category": "medium"
+    }
+  ],
+  "parsing_samples": [
+    {
+      "id": "parse_1",
+      "patient_context": {},
+      "input_text": "今天早餐后吃了二甲双胍 500mg，感觉还好",
+      "input_events": [],
+      "expected_medications": [
+        {
+          "medicine_name": "二甲双胍",
+          "dose": "500mg"
+        }
+      ],
+      "expected_health_metrics": []
+    },
+    {
+      "id": "parse_2",
+      "patient_context": {},
+      "input_text": "早上血压 148/92，有点头晕",
+      "input_events": [],
+      "expected_medications": [],
+      "expected_health_metrics": [
+        {
+          "type": "blood_pressure",
+          "num1": 148.0,
+          "num2": 92.0
+        }
+      ]
+    }
+  ]
+}
