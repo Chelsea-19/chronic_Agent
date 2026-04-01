@@ -1,4 +1,4 @@
-# China Chronic Care Agent Platform
+# China Chronic Care Agent Platform (Research Edition)
 
 This repository constitutes a publication-grade, localized artificial intelligence platform specifically designed for longitudinal chronic disease management (encompassing Type 2 Diabetes and Hypertension) within the context of Mainland China.
 
