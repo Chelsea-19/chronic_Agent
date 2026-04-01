@@ -1,41 +1,38 @@
 from __future__ import annotations
 
 from typing import Optional
-
 from sqlalchemy.orm import Session
 
-from chronic_agent.agent.chat import ChatAgent, LLMParams
-from chronic_agent.features.companion.service import CompanionService
-from chronic_agent.features.health.service import HealthTrackingService
+from chronic_agent.agent.chat import LLMParams
 from chronic_agent.platform.repositories import ChatRepository
-
 
 class CompanionChatService:
     def __init__(self, db: Session, patient_id: int, llm_params: Optional[LLMParams] = None):
+        self.db = db
+        self.patient_id = patient_id
         self.chat_repo = ChatRepository(db, patient_id)
-        self.health_service = HealthTrackingService(db, patient_id)
-        self.companion_service = CompanionService(db, patient_id)
-        self.agent = ChatAgent()
         self.llm_params = llm_params
 
     def handle_message(self, message: str):
+        from chronic_agent.agent.orchestrator import Orchestrator
+        # 1. Store user message
         self.chat_repo.add('user', message)
-        if message.strip().startswith('[TRACK]'):
-            self.health_service.track_from_chat(message)
-            reply = '已记录。你可以继续补充今天的血糖、血压、饮食、体重或症状。'
-            self.chat_repo.add('assistant', reply)
-            return {'reply': reply, 'tracked': True}
-
+        
+        # 2. Get history
         recent = [(m.role, m.content) for m in self.chat_repo.recent(limit=8)]
-        today = self.companion_service.today_view()
-        extra_context = (
-            f"\n【今日概览】待处理提醒 {today.pending_reminders} 条；"
-            f"最近空腹血糖 {today.latest_fasting_glucose or '暂无'}；"
-            f"最近血压 {today.latest_blood_pressure or '暂无'}。"
-        )
-        reply = self.agent.reply(message, recent, extra_context, llm_params=self.llm_params)
-        self.chat_repo.add('assistant', reply)
-        return {'reply': reply, 'tracked': False}
+        
+        # 3. Handle with orchestrator
+        orch = Orchestrator(self.db, self.patient_id)
+        result = orch.handle_message(message, recent, llm_params=self.llm_params)
+        
+        # 4. Store assistant response
+        self.chat_repo.add('assistant', result["reply"])
+        
+        return {
+            "reply": result["reply"],
+            "tracked": result.get("has_tool_use", False),
+            "trace": result.get("trace", [])
+        }
 
     def list_messages(self):
         return self.chat_repo.recent(limit=50)
