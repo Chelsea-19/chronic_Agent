@@ -13,6 +13,8 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     tracked: bool = False
+    trace: list[dict] = []
+    status: str = "success"
 
 
 class MedicationCreate(BaseModel):
