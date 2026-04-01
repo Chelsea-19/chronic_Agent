@@ -1,19 +1,22 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
-from chronic_agent.agent.chat import ChatAgent
+from chronic_agent.agent.chat import ChatAgent, LLMParams
 from chronic_agent.features.companion.service import CompanionService
 from chronic_agent.features.health.service import HealthTrackingService
 from chronic_agent.platform.repositories import ChatRepository
 
 
 class CompanionChatService:
-    def __init__(self, db: Session, patient_id: int):
+    def __init__(self, db: Session, patient_id: int, llm_params: Optional[LLMParams] = None):
         self.chat_repo = ChatRepository(db, patient_id)
         self.health_service = HealthTrackingService(db, patient_id)
         self.companion_service = CompanionService(db, patient_id)
         self.agent = ChatAgent()
+        self.llm_params = llm_params
 
     def handle_message(self, message: str):
         self.chat_repo.add('user', message)
@@ -30,7 +33,7 @@ class CompanionChatService:
             f"最近空腹血糖 {today.latest_fasting_glucose or '暂无'}；"
             f"最近血压 {today.latest_blood_pressure or '暂无'}。"
         )
-        reply = self.agent.reply(message, recent, extra_context)
+        reply = self.agent.reply(message, recent, extra_context, llm_params=self.llm_params)
         self.chat_repo.add('assistant', reply)
         return {'reply': reply, 'tracked': False}
 
