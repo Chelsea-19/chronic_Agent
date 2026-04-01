@@ -1,1 +1,174 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CarePilot CN Platform+</title><link rel="stylesheet" href="/static/styles.css"></head><body><div class="wrap"><h1>CarePilot CN Platform+</h1><div class="row"><label>当前患者</label><select id="patientSelect" onchange="onPatientChange(this.value)"></select><button onclick="createPatient()">新建患者</button><button onclick="createFollowup()">添加复诊</button></div><div class="grid"><section><h2>聊天 / 记录</h2><textarea id="chatInput" placeholder="输入消息，或用 [TRACK] 血压 138/86"></textarea><button onclick="sendChat()">发送</button><pre id="chatReply"></pre></section><section><h2>今日概览</h2><pre id="today"></pre></section><section><h2>药物</h2><input id="medName" placeholder="药名"><input id="medDose" placeholder="剂量"><input id="medSchedule" value="早餐后"><button onclick="addMedication()">添加药物</button><pre id="medications"></pre></section><section><h2>饮食分析</h2><textarea id="mealDesc" placeholder="例如：中午两碗米饭、红烧肉、奶茶"></textarea><button onclick="analyzeMeal()">分析饮食</button><pre id="mealResult"></pre><h3>周饮食摘要</h3><pre id="mealSummary"></pre></section><section><h2>工作流状态机</h2><select id="wfType"><option value="daily_review">daily_review</option><option value="medication_reconciliation">medication_reconciliation</option><option value="previsit_digest">previsit_digest</option></select><button onclick="runWorkflow()">运行工作流</button><pre id="workflowResult"></pre></section><section><h2>门诊摘要 / 报告导出</h2><button onclick="genDigest()">生成摘要</button><button onclick="genReport()">生成报告</button><button onclick="exportReport('pdf')">导出 PDF</button><button onclick="exportReport('docx')">导出 Word</button><button onclick="exportReport('html')">导出 HTML</button><div>当前报告ID: <span id="reportId"></span></div><pre id="digest"></pre><pre id="report"></pre></section><section><h2>提醒</h2><pre id="reminders"></pre></section><section><h2>患者时间线</h2><pre id="timeline"></pre></section></div></div><script src="/static/app.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CarePilot CN Platform+ — 慢病智能管理平台，集成 AI 对话、健康追踪、饮食分析和临床摘要生成">
+  <title>CarePilot CN Platform+</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- ===== Toast Container ===== -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ===== Settings Overlay ===== -->
+  <div id="settingsOverlay" class="settings-overlay" onclick="if(event.target===this)closeSettings()">
+    <div class="settings-panel">
+      <h2>⚙️ 系统设置</h2>
+      <p class="subtitle">配置大模型 API 接口，所有信息仅保存在您的浏览器本地</p>
+      <div class="field">
+        <label for="llmBaseUrl">LLM Base URL</label>
+        <input id="llmBaseUrl" type="url" placeholder="https://api.openai.com/v1 或兼容端点">
+      </div>
+      <div class="field">
+        <label for="llmApiKey">LLM API Key</label>
+        <input id="llmApiKey" type="password" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx">
+      </div>
+      <div class="field">
+        <label for="llmModel">模型名称（可选）</label>
+        <input id="llmModel" type="text" placeholder="gpt-4o-mini / deepseek-chat / qwen-plus">
+      </div>
+      <div id="settingsStatus" class="settings-status"></div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="closeSettings()">取消</button>
+        <button id="btnSaveConfig" onclick="saveLLMConfig()">💾 保存配置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== App Shell ===== -->
+  <div class="app-shell">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">🫀</div>
+        <h1>CarePilot CN Platform+</h1>
+      </div>
+      <div class="header-actions">
+        <span id="configBadge" class="config-badge disconnected">未配置模型</span>
+        <button class="btn-ghost" onclick="openSettings()">⚙️ 设置</button>
+      </div>
+    </header>
+
+    <!-- Patient Bar -->
+    <div class="patient-bar">
+      <label>👤 当前患者</label>
+      <select id="patientSelect" onchange="onPatientChange(this.value)"></select>
+      <button class="btn-sm" onclick="createPatient()">➕ 新建患者</button>
+      <button class="btn-sm" onclick="createFollowup()">📅 添加复诊</button>
+    </div>
+
+    <!-- Main Grid -->
+    <main class="main-content">
+      <div class="grid">
+
+        <!-- Chat Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-chat">💬</span> 聊天 / 记录</h2>
+          </div>
+          <div id="chatBox" class="chat-box"></div>
+          <div class="input-row">
+            <textarea id="chatInput" rows="2" placeholder="输入消息，或用 [TRACK] 血压 138/86 记录数据"></textarea>
+            <button id="btnSendChat" onclick="sendChat()">发送</button>
+          </div>
+        </section>
+
+        <!-- Today Overview Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-today">📊</span> 今日概览</h2>
+          </div>
+          <pre id="today" class="output-box"></pre>
+        </section>
+
+        <!-- Medications Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-med">💊</span> 药物管理</h2>
+          </div>
+          <div class="med-inputs">
+            <input id="medName" type="text" placeholder="药名">
+            <input id="medDose" type="text" placeholder="剂量">
+            <input id="medSchedule" type="text" value="早餐后" placeholder="服药时间">
+          </div>
+          <button id="btnAddMed" onclick="addMedication()">添加药物</button>
+          <pre id="medications" class="output-box"></pre>
+        </section>
+
+        <!-- Meal Analysis Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-meal">🍽️</span> 饮食分析</h2>
+          </div>
+          <textarea id="mealDesc" placeholder="例如：中午两碗米饭、红烧肉、奶茶"></textarea>
+          <div class="input-row">
+            <button id="btnAnalyzeMeal" onclick="analyzeMeal()">分析饮食</button>
+          </div>
+          <pre id="mealResult" class="output-box"></pre>
+          <div class="card-header" style="margin-top:16px;">
+            <h2 style="font-size:14px;">📈 周饮食摘要</h2>
+          </div>
+          <pre id="mealSummary" class="output-box"></pre>
+        </section>
+
+        <!-- Workflow Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-workflow">⚡</span> 工作流状态机</h2>
+          </div>
+          <div class="input-row">
+            <select id="wfType" style="flex:1;">
+              <option value="daily_review">daily_review — 每日回顾</option>
+              <option value="medication_reconciliation">medication_reconciliation — 药物核对</option>
+              <option value="previsit_digest">previsit_digest — 门诊前摘要</option>
+            </select>
+            <button id="btnRunWorkflow" onclick="runWorkflow()">运行</button>
+          </div>
+          <pre id="workflowResult" class="output-box"></pre>
+        </section>
+
+        <!-- Report / Digest Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-report">📑</span> 门诊摘要 / 报告</h2>
+          </div>
+          <div class="export-row">
+            <button id="btnGenDigest" onclick="genDigest()">生成摘要</button>
+            <button id="btnGenReport" onclick="genReport()">生成报告</button>
+          </div>
+          <div class="export-row" style="margin-top:8px;">
+            <button class="btn-sm" onclick="exportReport('pdf')">📄 PDF</button>
+            <button class="btn-sm" onclick="exportReport('docx')">📝 Word</button>
+            <button class="btn-sm" onclick="exportReport('html')">🌐 HTML</button>
+          </div>
+          <p class="report-id">当前报告ID: <span id="reportId">—</span></p>
+          <pre id="digest" class="output-box"></pre>
+          <pre id="report" class="output-box"></pre>
+        </section>
+
+        <!-- Reminders Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-reminder">🔔</span> 今日提醒</h2>
+          </div>
+          <pre id="reminders" class="output-box"></pre>
+        </section>
+
+        <!-- Timeline Card -->
+        <section class="card">
+          <div class="card-header">
+            <h2><span class="icon icon-timeline">🗂️</span> 患者时间线</h2>
+          </div>
+          <pre id="timeline" class="output-box"></pre>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
