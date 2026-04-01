@@ -175,14 +175,55 @@ window.onPatientChange = async function (v) {
   await refreshAll();
 };
 
-window.createPatient = async function () {
-  const name = prompt('请输入患者姓名');
-  if (!name) return;
+// ─── Patient Modal ───
+window.openPatientModal = function() {
+  document.getElementById('patientModal').classList.add('open');
+};
+
+window.closePatientModal = function() {
+  document.getElementById('patientModal').classList.remove('open');
+};
+
+window.submitPatient = async function() {
+  const name = document.getElementById('pName').value.trim();
+  const gender = document.getElementById('pGender').value;
+  const age = document.getElementById('pAge').value;
+  const phone = document.getElementById('pPhone').value.trim();
+  const diagnosis = document.getElementById('pDiagnosis').value.trim();
+
+  if (!name) {
+    showToast('姓名是必填项', 'warning');
+    return;
+  }
+
+  setLoading('btnSubmitPatient', true);
   try {
-    await api('/patients', { method: 'POST', body: JSON.stringify({ name }) });
+    const newPatient = await api('/patients', {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        gender,
+        age: age ? parseInt(age) : null,
+        phone,
+        diagnosis_summary: diagnosis
+      })
+    });
     showToast(`患者 "${name}" 创建成功`, 'success');
     await loadPatients();
-  } catch (e) { /* handled */ }
+    // Auto switch to new patient
+    patientId = newPatient.id;
+    document.getElementById('patientSelect').value = String(patientId);
+    await refreshAll();
+    closePatientModal();
+    // Clear form
+    document.getElementById('pName').value = '';
+    document.getElementById('pAge').value = '';
+    document.getElementById('pPhone').value = '';
+    document.getElementById('pDiagnosis').value = '';
+  } catch (e) {
+    console.error(e);
+  }
+  setLoading('btnSubmitPatient', false, '💾 保存并切换');
 };
 
 // ──────────────────────────────────────────────
@@ -263,10 +304,10 @@ window.genDigest = async function () {
   setLoading('btnGenDigest', true);
   try {
     const data = await api('/digest?window_days=14', { method: 'POST' });
-    document.getElementById('digest').textContent = data.markdown;
+    document.getElementById('digest').innerHTML = formatMarkdown(data.markdown);
     showToast('临床摘要生成完成', 'success');
   } catch (e) { /* handled */ }
-  setLoading('btnGenDigest', false, '生成摘要');
+  setLoading('btnGenDigest', false, '📈 生成摘要');
 };
 
 window.genReport = async function () {
@@ -276,12 +317,24 @@ window.genReport = async function () {
       method: 'POST',
       body: JSON.stringify({ report_type: 'clinician_previsit', window_days: 14 }),
     });
-    document.getElementById('report').textContent = data.markdown;
+    document.getElementById('report').innerHTML = formatMarkdown(data.markdown);
     document.getElementById('reportId').textContent = data.id;
-    showToast('报告生成完成', 'success');
+    showToast('完整报告生成完成', 'success');
   } catch (e) { /* handled */ }
-  setLoading('btnGenReport', false, '生成报告');
+  setLoading('btnGenReport', false, '📄 生成报告');
 };
+
+// Basic Markdown formatter for previews
+function formatMarkdown(md) {
+  if (!md) return '<p class="empty">暂无内容</p>';
+  return md
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+    .replace(/^\* (.*$)/gim, '<li>$1</li>')
+    .replace(/\n/gim, '<br>');
+}
 
 window.exportReport = async function (fmt) {
   const id = document.getElementById('reportId').textContent;
@@ -311,17 +364,40 @@ window.runWorkflow = async function () {
 // ──────────────────────────────────────────────
 // 12. Follow-up
 // ──────────────────────────────────────────────
-window.createFollowup = async function () {
-  const d = prompt('请输入复诊日期（YYYY-MM-DD）');
-  if (!d) return;
+// ─── Follow-up Modal ───
+window.openFollowupModal = function() {
+  // Set default date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('fDate').value = today;
+  document.getElementById('followupModal').classList.add('open');
+};
+
+window.closeFollowupModal = function() {
+  document.getElementById('followupModal').classList.remove('open');
+};
+
+window.submitFollowup = async function() {
+  const date = document.getElementById('fDate').value;
+  const purpose = document.getElementById('fPurpose').value.trim();
+
+  if (!date) {
+    showToast('请选择日期', 'warning');
+    return;
+  }
+
+  setLoading('btnSubmitFollowup', true);
   try {
     await api(`/patients/${patientId}/followups`, {
       method: 'POST',
-      body: JSON.stringify({ scheduled_for: d, purpose: '复诊' }),
+      body: JSON.stringify({ scheduled_for: date, purpose: purpose || '复诊' }),
     });
-    showToast(`复诊（${d}）已添加`, 'success');
+    showToast(`复诊（${date}）已添加`, 'success');
     await loadTimeline();
-  } catch (e) { /* handled */ }
+    closeFollowupModal();
+  } catch (e) {
+    console.error(e);
+  }
+  setLoading('btnSubmitFollowup', false, '🗓️ 添加预约');
 };
 
 // ──────────────────────────────────────────────
@@ -330,31 +406,153 @@ window.createFollowup = async function () {
 async function loadTimeline() {
   try {
     const rows = await api(`/patients/${patientId}/timeline`);
-    document.getElementById('timeline').textContent = rows
-      .map(r => `${r.occurred_at} | ${r.item_type} | ${r.title} | ${r.detail}`)
-      .join('\n');
+    const container = document.getElementById('timeline');
+    if (!container) return;
+
+    if (!rows || rows.length === 0) {
+      container.innerHTML = '<div class="timeline-empty">暂无事件记录</div>';
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="timeline-list">
+        ${rows.map(r => `
+          <div class="timeline-row">
+            <div class="tl-time">${new Date(r.occurred_at).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>
+            <div class="tl-dot ${r.item_type}"></div>
+            <div class="tl-content">
+              <div class="tl-title">${r.title}</div>
+              <div class="tl-detail">${truncateText(r.detail, 100)}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
   } catch (e) { /* handled */ }
 }
 
+function truncateText(text, len) {
+  if (!text || text.length <= len) return text;
+  return text.slice(0, len) + '...';
+}
+
+async function loadRecommendations() {
+  const container = document.getElementById('aiRecommendations');
+  if (!container) return;
+
+  try {
+    const recs = await api('/companion/recommendations');
+    if (!recs || recs.length === 0) {
+      container.innerHTML = '<div class="recommendation-item">目前一切正常，继续保持！</div>';
+      return;
+    }
+
+    container.innerHTML = recs.map(r => `
+      <div class="recommendation-item priority-${r.priority}" onclick="handleRecommendationClick('${r.id}', '${r.action_type}', ${JSON.stringify(r.action_payload).replace(/"/g, '&quot;')})">
+        <div class="reco-title">${r.title}</div>
+        <div class="reco-desc">${r.description}</div>
+        <div class="reco-action">
+          <span>${getActionIcon(r.action_type)}</span>
+          <span>${getActionLabel(r.action_type)}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<div class="recommendation-item error">推荐加载失败</div>';
+  }
+}
+
+function getActionIcon(type) {
+  const icons = { input: '✏️', workflow: '⚡', view: '🔍' };
+  return icons[type] || '→';
+}
+
+function getActionLabel(type) {
+  const labels = { input: '立即录入', workflow: '启动流', view: '查看详情' };
+  return labels[type] || '去执行';
+}
+
+window.handleRecommendationClick = async function(id, type, payload) {
+  if (type === 'input') {
+    const input = document.getElementById('chatInput');
+    input.value = payload.placeholder || '';
+    input.focus();
+    showToast('已准备好输入，请完善数据并发送', 'info');
+  } else if (type === 'workflow') {
+    document.getElementById('wfType').value = payload.workflow;
+    await runWorkflow();
+  } else if (type === 'view') {
+    showToast('正在为您定位到相关功能...', 'info');
+    // Scroll to relevant section if needed
+  }
+};
+
 async function refreshAll() {
+  await loadRecommendations();
+  
+  // Today Overview
   try {
     const today = await api('/companion/today');
-    document.getElementById('today').textContent = JSON.stringify(today, null, 2);
+    const el = document.getElementById('today');
+    el.innerHTML = `
+      <div class="summary-grid">
+        <div class="summary-item">
+          <label>🩸 血压</label>
+          <div class="val">${today.latest_blood_pressure || '--'}</div>
+        </div>
+        <div class="summary-item">
+          <label>🍬 空腹血糖</label>
+          <div class="val">${today.latest_fasting_glucose || '--'} <span class="unit">mmol/L</span></div>
+        </div>
+        <div class="summary-item">
+          <label>🔔 待办提醒</label>
+          <div class="val">${today.pending_reminders}</div>
+        </div>
+      </div>
+      <div class="coach-msg">${today.coach_message}</div>
+    `;
   } catch (e) { /* handled */ }
 
+  // Medications
   try {
     const meds = await api('/medications');
-    document.getElementById('medications').textContent = JSON.stringify(meds, null, 2);
+    const el = document.getElementById('medications');
+    if (meds.length === 0) { el.innerHTML = '<p class="empty">无正在服用的药物</p>'; }
+    else {
+      el.innerHTML = `<ul class="med-list">
+        ${meds.map(m => `<li><strong>${m.medicine_name}</strong>: ${m.dose} (${m.schedule})</li>`).join('')}
+      </ul>`;
+    }
   } catch (e) { /* handled */ }
 
+  // Meal Summary
   try {
     const meals = await api('/meals/weekly-summary');
-    document.getElementById('mealSummary').textContent = JSON.stringify(meals, null, 2);
+    const el = document.getElementById('mealSummary');
+    el.innerHTML = `
+      <div class="meal-stat">
+        本周记录: <strong>${meals.total_records}</strong> 次 | 
+        高风险标签: ${meals.top_risk_tags.length ? meals.top_risk_tags.map(t => `<span class="tag">${t}</span>`).join('') : '无'}
+      </div>
+    `;
   } catch (e) { /* handled */ }
 
+  // Reminders
   try {
-    const reminders = await api('/reminders/generate-today', { method: 'POST' });
-    document.getElementById('reminders').textContent = JSON.stringify(reminders, null, 2);
+    const res = await api('/reminders/generate-today', { method: 'POST' });
+    const reminders = await api('/reminders');
+    const el = document.getElementById('reminders');
+    if (reminders.length === 0) { el.innerHTML = '<p class="empty">今日无服药提醒</p>'; }
+    else {
+      el.innerHTML = `<div class="reminder-list">
+        ${reminders.map(r => `
+          <div class="reminder-row ${r.status}">
+            <div class="re-info"><strong>${r.medicine_name}</strong> - ${r.schedule_label}</div>
+            <div class="re-status">${r.status === 'done' ? '✅' : '⏳'}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    }
   } catch (e) { /* handled */ }
 
   await loadTimeline();

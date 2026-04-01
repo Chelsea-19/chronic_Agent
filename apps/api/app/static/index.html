@@ -36,6 +36,66 @@
     </div>
   </div>
 
+  <!-- ===== Patient Modal ===== -->
+  <div id="patientModal" class="settings-overlay" onclick="if(event.target===this)closePatientModal()">
+    <div class="settings-panel">
+      <h2>👤 新建患者</h2>
+      <p class="subtitle">请输入患者基本信息并保存</p>
+      <div class="field">
+        <label for="pName">姓名 *</label>
+        <input id="pName" type="text" placeholder="例如：张三" required>
+      </div>
+      <div class="field-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="field">
+          <label for="pGender">性别</label>
+          <select id="pGender">
+            <option value="male">男</option>
+            <option value="female">女</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="pAge">年龄</label>
+          <input id="pAge" type="number" placeholder="例如：45">
+        </div>
+      </div>
+      <div class="field">
+        <label for="pPhone">联系电话</label>
+        <input id="pPhone" type="tel" placeholder="例如：13800000000">
+      </div>
+      <div class="field">
+        <label for="pDiagnosis">诊断概况</label>
+        <textarea id="pDiagnosis" placeholder="例如：2型糖尿病，高血压2级"></textarea>
+      </div>
+      <div id="patientModalStatus" class="settings-status"></div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="closePatientModal()">取消</button>
+        <button id="btnSubmitPatient" onclick="submitPatient()">💾 保存并切换</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Follow-up Modal ===== -->
+  <div id="followupModal" class="settings-overlay" onclick="if(event.target===this)closeFollowupModal()">
+    <div class="settings-panel">
+      <h2>📅 添加复诊</h2>
+      <p class="subtitle">为当前患者安排新的复诊日期</p>
+      <div class="field">
+        <label for="fDate">复诊日期 *</label>
+        <input id="fDate" type="date">
+      </div>
+      <div class="field">
+        <label for="fPurpose">复诊目的</label>
+        <input id="fPurpose" type="text" value="糖尿病及高血压定期随访" placeholder="例如：常规模拟随访">
+      </div>
+      <div id="followupModalStatus" class="settings-status"></div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="closeFollowupModal()">取消</button>
+        <button id="btnSubmitFollowup" onclick="submitFollowup()">🗓️ 添加预约</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== App Shell ===== -->
   <div class="app-shell">
 
@@ -55,12 +115,24 @@
     <div class="patient-bar">
       <label>👤 当前患者</label>
       <select id="patientSelect" onchange="onPatientChange(this.value)"></select>
-      <button class="btn-sm" onclick="createPatient()">➕ 新建患者</button>
-      <button class="btn-sm" onclick="createFollowup()">📅 添加复诊</button>
+      <button class="btn-sm" onclick="openPatientModal()">➕ 新建患者</button>
+      <button class="btn-sm" onclick="openFollowupModal()">📅 添加复诊</button>
     </div>
 
     <!-- Main Grid -->
     <main class="main-content">
+      <div class="agent-prime-row">
+        <!-- Agent Recommendations Card (Enhanced) -->
+        <section class="card recommendations-card">
+          <div class="card-header">
+            <h2><span class="icon icon-star">✨</span> Agent 专属建议 / 下一步行动</h2>
+          </div>
+          <div id="aiRecommendations" class="recommendations-container">
+            <div class="recommendation-item skeleton">正在分析患者状态...</div>
+          </div>
+        </section>
+      </div>
+
       <div class="grid">
 
         <!-- Chat Card -->
@@ -134,18 +206,27 @@
           <div class="card-header">
             <h2><span class="icon icon-report">📑</span> 门诊摘要 / 报告</h2>
           </div>
-          <div class="export-row">
-            <button id="btnGenDigest" onclick="genDigest()">生成摘要</button>
-            <button id="btnGenReport" onclick="genReport()">生成报告</button>
+          <div class="report-controls">
+            <div class="btn-group">
+              <button id="btnGenDigest" onclick="genDigest()" class="btn-sm">📈 生成临床摘要</button>
+              <button id="btnGenReport" onclick="genReport()" class="btn-sm">📄 生成全量报告</button>
+            </div>
+            <div class="btn-group export-btns">
+              <button class="btn-ghost btn-xs" onclick="exportReport('pdf')">PDF</button>
+              <button class="btn-ghost btn-xs" onclick="exportReport('docx')">Word</button>
+            </div>
           </div>
-          <div class="export-row" style="margin-top:8px;">
-            <button class="btn-sm" onclick="exportReport('pdf')">📄 PDF</button>
-            <button class="btn-sm" onclick="exportReport('docx')">📝 Word</button>
-            <button class="btn-sm" onclick="exportReport('html')">🌐 HTML</button>
+          
+          <div class="report-preview-container">
+            <div id="digestPreview" class="preview-box">
+              <div class="preview-label">临床摘要预览</div>
+              <div id="digest" class="preview-content"></div>
+            </div>
+            <div id="reportPreview" class="preview-box">
+              <div class="preview-label">完整报告内容 (ID: <span id="reportId">—</span>)</div>
+              <div id="report" class="preview-content"></div>
+            </div>
           </div>
-          <p class="report-id">当前报告ID: <span id="reportId">—</span></p>
-          <pre id="digest" class="output-box"></pre>
-          <pre id="report" class="output-box"></pre>
         </section>
 
         <!-- Reminders Card -->
