@@ -1,16 +1,108 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import Optional
+
+import httpx
 
 from chronic_agent.platform.settings import settings
 
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class LLMParams:
+    api_key: str = ''
+    base_url: str = ''
+    model: str = 'gpt-4o-mini'
+
+
+SYSTEM_PROMPT = (
+    '你是一位慢性病管理 AI 助手 (CarePilot)，专注于中国大陆 2 型糖尿病合并高血压患者的日常健康管理。'
+    '请从以下五个维度给出简洁、专业且友好的建议：控糖、控压、依从性、饮食和复诊准备。'
+    '回复必须使用简体中文，并在必要时引用患者的最新监测数据来佐证你的分析。'
+    '如果信息不足，主动引导患者补充今日血糖、血压、饮食或服药情况。'
+)
+
 
 class ChatAgent:
-    def reply(self, user_message: str, recent_messages: Sequence[tuple[str, str]], extra_context: str = '') -> str:
-        if settings.enable_fake_llm:
-            return self._fake_reply(user_message, recent_messages, extra_context)
+    """Wraps both real LLM calls and a rule-based fallback."""
+
+    def reply(
+        self,
+        user_message: str,
+        recent_messages: Sequence[tuple[str, str]],
+        extra_context: str = '',
+        llm_params: Optional[LLMParams] = None,
+    ) -> str:
+        params = llm_params or LLMParams()
+
+        # Decide whether to call the real LLM
+        use_real = bool(params.api_key and params.base_url and not settings.enable_fake_llm)
+
+        if use_real:
+            try:
+                return self._real_llm_call(user_message, recent_messages, extra_context, params)
+            except Exception as exc:
+                logger.warning('LLM call failed, falling back to rules: %s', exc)
+                return f'[LLM 调用失败: {exc}]\n\n' + self._fake_reply(user_message, recent_messages, extra_context)
+
         return self._fake_reply(user_message, recent_messages, extra_context)
 
+    # ── Real LLM Call (OpenAI-Compatible) ─────────────────────
+    def _real_llm_call(
+        self,
+        user_message: str,
+        recent_messages: Sequence[tuple[str, str]],
+        extra_context: str,
+        params: LLMParams,
+    ) -> str:
+        messages = [{'role': 'system', 'content': SYSTEM_PROMPT}]
+
+        # Inject recent conversation history
+        for role, content in recent_messages[-6:]:
+            messages.append({'role': role, 'content': content})
+
+        # Inject extra context as a system hint
+        if extra_context:
+            messages.append({'role': 'system', 'content': f'以下是患者的当前健康概览，请结合此信息回复：{extra_context}'})
+
+        messages.append({'role': 'user', 'content': user_message})
+
+        # Build the API endpoint
+        base = params.base_url.rstrip('/')
+        # Support both "/v1" style and direct base URL
+        if not base.endswith('/v1') and not base.endswith('/chat/completions'):
+            url = f'{base}/v1/chat/completions'
+        elif base.endswith('/v1'):
+            url = f'{base}/chat/completions'
+        else:
+            url = base
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {params.api_key}',
+        }
+
+        payload = {
+            'model': params.model,
+            'messages': messages,
+            'temperature': 0.7,
+            'max_tokens': 1024,
+        }
+
+        logger.info('Calling LLM: %s model=%s', url, params.model)
+
+        with httpx.Client(timeout=60.0) as client:
+            resp = client.post(url, json=payload, headers=headers)
+            resp.raise_for_status()
+            data = resp.json()
+
+        return data['choices'][0]['message']['content'].strip()
+
+    # ── Rule-Based Fallback ───────────────────────────────────
     def _fake_reply(self, user_message: str, recent_messages: Sequence[tuple[str, str]], extra_context: str = '') -> str:
         prefix = '我会从控糖、控压、依从性、饮食和复诊准备角度给你建议。'
         if '总结' in user_message or '复诊' in user_message:
