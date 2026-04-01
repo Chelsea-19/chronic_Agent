@@ -8,6 +8,8 @@ from chronic_agent.core.contracts import CompanionTodayOut
 from chronic_agent.features.companion.service import CompanionService
 from chronic_agent.platform.security import require_bearer_token
 
+from chronic_agent.features.companion.recommendations import RecommendationService
+
 router = APIRouter(prefix='/companion', tags=['companion'])
 
 
@@ -19,3 +21,8 @@ def today(db: Session = Depends(get_session), patient_id: int = Depends(get_pati
 @router.get('/insights', dependencies=[Depends(require_bearer_token)])
 def insights(db: Session = Depends(get_session), patient_id: int = Depends(get_patient_id)):
     return CompanionService(db, patient_id).insights()
+
+
+@router.get('/recommendations', dependencies=[Depends(require_bearer_token)])
+def list_recommendations(db: Session = Depends(get_session), patient_id: int = Depends(get_patient_id)):
+    return RecommendationService(db, patient_id).get_recommendations()
