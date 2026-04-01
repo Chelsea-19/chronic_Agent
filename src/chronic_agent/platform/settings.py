@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     database_url: str = 'sqlite:///./carepilot_cn.db'
     default_window_days: int = 14
     export_dir: str = './exports'
+    enable_fake_llm: bool = True
+    default_llm_model: str = 'gpt-4o-mini'
 
     @property
     def export_path(self) -> Path:
